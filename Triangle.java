@@ -106,14 +106,14 @@ public class Triangle extends Shape {
 				// variables for calculating lines drawn by triangle's sides
 				double m1, b1, m2, b2;
 				
-				m2 = Math.abs((left.y-right.y) / (left.x-right.x));
+				m2 = (left.y-right.y) / (left.x-right.x);
 				b2 = left.y - m2*left.x;
 				
 				// check lower and upper y-bounds on the left side of mid
 				if (c.x <= mid.x) {
-					m1 = Math.abs((left.y-mid.y) / (left.x-mid.x));
+					m1 = (left.y-mid.y) / (left.x-mid.x);
 					b1 = left.y - m1*left.x;
-					m2 = Math.abs((left.y-right.y) / (left.x-right.x));
+					m2 = (left.y-right.y) / (left.x-right.x);
 					b2 = left.y - m2*left.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
 						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
@@ -123,7 +123,7 @@ public class Triangle extends Shape {
 
 				// check lower and upper y-bounds on the right side of mid
 				else {
-					m1 = Math.abs((mid.y-right.y) / (mid.x-right.x));
+					m1 = (mid.y-right.y) / (mid.x-right.x);
 					b1 = right.y - m1*right.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
 						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
