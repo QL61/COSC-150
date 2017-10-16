@@ -116,7 +116,7 @@ public class Triangle extends Shape {
 					m2 = (left.y-right.y) / (left.x-right.x);
 					b2 = left.y - m2*left.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
-						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
+						&& (c.y <= Math.min((m1*c.x + b1), (m2*c.x + b2))))) {
 							range = true;
 					} // END if
 				} // END if
@@ -126,7 +126,7 @@ public class Triangle extends Shape {
 					m1 = (mid.y-right.y) / (mid.x-right.x);
 					b1 = right.y - m1*right.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
-						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
+						&& (c.y <= Math.min((m1*c.x + b1), (m2*c.x + b2))))) {
 							range = true;
 					} // END if
 				} // END else
