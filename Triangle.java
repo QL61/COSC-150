@@ -71,9 +71,11 @@ public class Triangle extends Shape {
 	@Override
 	public boolean isInRange(Coordinates c) {
 		
+		boolean range = false;
+
 		// basic out-of-range checks
-		if ((c.x >= Math.min(v1.x, v2.x)) && (c.x >= v3.x) && (c.x <= Math.max(v1.x, v2.x)) && c.x <= v3.x) {
-			if ((c.y >= Math.min(v1.y, v2.y)) && (c.y >= v3.y) && (c.y <= Math.max(v1.y, v2.y)) && c.y <= v3.y) {
+		if (((c.x >= Math.min(v1.x, v2.x)) || (c.x >= v3.x)) && ((c.x <= Math.max(v1.x, v2.x)) || c.x <= v3.x)) {
+			if (((c.y >= Math.min(v1.y, v2.y)) || (c.y >= v3.y)) && ((c.y <= Math.max(v1.y, v2.y)) || (c.y <= v3.y))) {
 				
 				// find vertex with "middle" x-value, assign other vertices to variables for later
 				// use in checking y-bounds
@@ -115,7 +117,7 @@ public class Triangle extends Shape {
 					b2 = left.y - m2*left.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
 						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
-							return true;
+							range = true;
 					} // END if
 				} // END if
 
@@ -125,14 +127,14 @@ public class Triangle extends Shape {
 					b1 = right.y - m1*right.x;
 					if ((c.y >= Math.max((m1*c.x + b1), (m2*c.x + b2)) 
 						&& (c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2))))) {
-							return true;
+							range = true;
 					} // END if
 				} // END else
 				
 			} // END if (basic out-of-range check)
 		} // END if (basic out-of-range check)
 		
-		return false;
+		return range;
 		
 	} // END isInRange(Coordinates)
 	
