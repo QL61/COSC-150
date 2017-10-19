@@ -169,69 +169,72 @@ public class Triangle extends Shape {
 		// basic out-of-range checks
 		if(c.getX() >= minCurX && c.getX() <= maxCurX && c.getY() >= minCurY && c.getY() <= maxCurY)
 		{
-//			if ((c.getX() >= Math.min(v1.getX(), v2.getX())) && (c.getX() >= v3.getX()) && (c.getX() <= Math.max(v1.getX(), v2.getX())) && c.getX() <= v3.getX()) {
-//				if ((c.y >= Math.min(v1.y, v2.y)) && (c.y >= v3.y) && (c.y <= Math.max(v1.y, v2.y)) && c.y <= v3.y) {
+			// check to see if c is close to a vertex
+			if (distanceBetween(c, v1) <= 50 || 
+					distanceBetween(c, v2) <= 50 || distanceBetween(c, v3) <= 50) {
+				inRange = true;
+			}
 
-					System.out.println("isInRange basic checks true");
+//					System.out.println("isInRange basic checks true");
+//
+//					// find vertex with "middle" x-value, assign other vertices to variables for later
+//					// use in checking y-bounds
+//					Coordinates left, mid, right;
+//					if (v1.x >= Math.max(v2.x, v3.x)) {
+//						if (v2.x >= v3.x) {
+//							mid = v2;
+//							left = v3;
+//							right = v1;
+//						}
+//						else { 
+//							mid = v3; 
+//							left = v2;
+//							right = v1;
+//						}
+//					}
+//					else if (v2.x >= v3.x) { 
+//						mid = v3; 
+//						left = v1;
+//						right = v2;
+//					}
+//					else { 
+//						mid = v2;
+//						left = v1;
+//						right = v3;
+//					}
+//					System.out.println(left.x+", "+left.y);
+//					System.out.println(mid.x+", "+mid.y);
+//					System.out.println(right.x+", "+right.y);
+//					
+//					// variables for calculating lines drawn by triangle's sides
+//					double m1, b1, m2, b2;
+//
+//					m1 = (double)(((double)(left.y)-(double)(right.y)) / ((double)(left.x)-(double)(right.x)));
+//					b1 = (double)(left.y) - (double)(m1*(double)(left.x));
+//
+//					// create lower and upper y-bounds on the left side of mid
+//					if (c.x <= mid.x) {
+//						m2 = (double)(((double)(mid.y)-(double)(left.y)) / ((double)(mid.x)-(double)(left.x)));
+//						b2 = (double)(left.y) - (double)(m2*(double)(left.x));
+//					} // END if
+//
+//					// create lower and upper y-bounds on the right side of mid
+//					else {
+//						m2 = (double)(((double)(right.y)-(double)(mid.y)) / ((double)(right.x)-(double)(mid.x)));
+//						b2 = (double)(right.y) - (double)(m2*(double)(right.x));
+//					}
+//					
+//					// check for y between bounds
+//					if ((c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2)) && 
+//							(c.y >= Math.min((m1*c.x + b1), (m2*c.x + b2))))) 
+//					{
+//							inRange = true;
+//					}
 
-					// find vertex with "middle" x-value, assign other vertices to variables for later
-					// use in checking y-bounds
-					Coordinates left, mid, right;
-					if (v1.x >= Math.max(v2.x, v3.x)) {
-						if (v2.x >= v3.x) {
-							mid = v2;
-							left = v3;
-							right = v1;
-						}
-						else { 
-							mid = v3; 
-							left = v2;
-							right = v1;
-						}
-					}
-					else if (v2.x >= v3.x) { 
-						mid = v3; 
-						left = v1;
-						right = v2;
-					}
-					else { 
-						mid = v2;
-						left = v1;
-						right = v3;
-					}
-					System.out.println(left.x+", "+left.y);
-					System.out.println(mid.x+", "+mid.y);
-					System.out.println(right.x+", "+right.y);
-					
-					// variables for calculating lines drawn by triangle's sides
-					double m1, b1, m2, b2;
-
-					m1 = (double)(((double)(left.y)-(double)(right.y)) / ((double)(left.x)-(double)(right.x)));
-					b1 = (double)(left.y) - (double)(m1*(double)(left.x));
-
-					// create lower and upper y-bounds on the left side of mid
-					if (c.x <= mid.x) {
-						m2 = (double)(((double)(mid.y)-(double)(left.y)) / ((double)(mid.x)-(double)(left.x)));
-						b2 = (double)(left.y) - (double)(m2*(double)(left.x));
-					} // END if
-
-					// create lower and upper y-bounds on the right side of mid
-					else {
-						m2 = (double)(((double)(right.y)-(double)(mid.y)) / ((double)(right.x)-(double)(mid.x)));
-						b2 = (double)(right.y) - (double)(m2*(double)(right.x));
-					}
-					
-					// check for y between bounds
-					if ((c.y <= Math.max((m1*c.x + b1), (m2*c.x + b2)) && 
-							(c.y >= Math.min((m1*c.x + b1), (m2*c.x + b2))))) 
-					{
-							inRange = true;
-					}
-
-					System.out.println("m1 = " + m1);
-					System.out.println("b1 = " + b1);
-					System.out.println("m2 = " + m2);
-					System.out.println("b2 = " + b2);
+//					System.out.println("m1 = " + m1);
+//					System.out.println("b1 = " + b1);
+//					System.out.println("m2 = " + m2);
+//					System.out.println("b2 = " + b2);
 		//		}
 //			} // END if (basic out-of-range check)
 		} // END if (basic out-of-range check)
@@ -244,7 +247,7 @@ public class Triangle extends Shape {
 	@Override
 	public void resize (Coordinates press, Coordinates release) {
 		if (isInRange(press)) {
-			if (distanceBetween(press, v1) <= Math.max(distanceBetween(press, v2), distanceBetween(press, v3))) {
+			if (distanceBetween(press, v1) <= Math.min(distanceBetween(press, v2), distanceBetween(press, v3))) {
 				this.setV1(release);
 			}
 			else if (distanceBetween(press, v2) < distanceBetween(press, v3)) {
