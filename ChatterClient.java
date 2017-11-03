@@ -14,6 +14,7 @@ public class ChatterClient {
 	BufferedReader bin;
 	BufferedWriter bout;
 	Listen listenToServer;
+	boolean keepGoing = true;
 
 	public static void main(String[] args) {
 		try {
@@ -42,7 +43,7 @@ public class ChatterClient {
 
 	public ChatterClient() {
 		System.out.println("chat client starting ...");
-		boolean keepGoing = true; 
+		keepGoing = true; 
 		
 		try
 		{
@@ -71,8 +72,10 @@ public class ChatterClient {
 		@Override
 		public void run() {
 			try {
-				String msg = bin.readLine();
-				if (msg != null) { System.out.println("from server: " + msg); }	
+				while (keepGoing) {
+					String msg = bin.readLine();
+					if (msg != null) { System.out.println("from server: " + msg); }	
+				}
 			}
 			catch (IOException ioe) {
 				System.err.println("Caught in Listen.run(): " + ioe + " from ");
