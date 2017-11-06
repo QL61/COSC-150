@@ -1,0 +1,298 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+
+/*
+ * The Client with its GUI
+ */
+public class ClientGUI extends JFrame implements ActionListener, KeyListener{
+
+	private static final long serialVersionUID = 1L;
+	private static final String WELCOME_TO_CHAT = "Welcome to the Chatroom";
+	private static final String TYPE_CHAT_MSG = "Type Chat Message Here";
+	private JLabel usernamelabel;							// to hold label to ask for username
+	private JTextField username;							// to hold current username
+	private String oldUsername;
+	private JTextField tfServer, tfPort;					// to write the server address and port number
+	private JButton loginBtn, sendBtn, exitBtn;	// buttons
+	private JComboBox usernameList; 						// to see list of all people
+	private String curRecipient;
+	private JTextArea taMsgHistory;							// to see message history
+	private JTextArea taMessenger;							// for person to type
+	private boolean connected;								// if it is for connection
+	private int defaultPort;								// the default port number
+	private String defaultIP;								// the default host
+	private Client client;
+
+//	HashMap<String, ArrayList<String>> allHistory = new HashMap();
+	
+//	ChatServer cs = new ChatServer();
+
+	ArrayList<String> nameList = new ArrayList<String>();
+
+	// to start the whole thing the server
+	public static void main(String[] args) {
+		new ClientGUI("localhost", 55305);
+	}
+	
+	
+	// Constructor connection receiving a socket number
+	ClientGUI(String host, int port) {		
+		super("Chat Client");
+		defaultPort = port;
+		defaultIP = host;
+
+		System.out.println("inside clientGUI constructor");
+		
+		// The NorthPanel with:
+		JPanel northPanel = new JPanel(new GridLayout(3,2)); // the server name and port number
+		JPanel serverAddress = new JPanel(new GridLayout(1, 2)); // the JTextField with default value for server address
+		JPanel portNumber = new JPanel(new GridLayout(1, 2)); // the JTextField with default value for port number
+		tfServer = new JTextField(host);
+		tfPort = new JTextField("" + port);
+		tfPort.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		serverAddress.add(new JLabel("Server Address:  "));
+		serverAddress.add(tfServer);
+		portNumber.add(new JLabel("Port Number:  "));
+		portNumber.add(tfPort);
+		// adds the Server an port field to the GUI
+		northPanel.add(serverAddress, BorderLayout.NORTH);
+		northPanel.add(portNumber, BorderLayout.NORTH);
+
+		// the Label and the TextField
+		usernamelabel = new JLabel("Enter your username below", SwingConstants.CENTER);
+		northPanel.add(usernamelabel, BorderLayout.LINE_START);
+		northPanel.add(new JLabel(""));
+		username = new JTextField("Anonymous");
+		username.setBackground(Color.WHITE);
+		northPanel.add(username, BorderLayout.SOUTH);
+
+		// username list creation
+		
+//		String nameList[] = cs.getArrayOfMap();
+		nameList.add("Group");
+		nameList.add("Alpha");
+		nameList.add("Beta");
+		usernameList = new JComboBox(nameList.toArray());
+		usernameList.addActionListener(this);
+		usernameList.setEnabled(false);
+		northPanel.add(usernameList, BorderLayout.SOUTH);
+		//add to frame
+		add(northPanel, BorderLayout.NORTH);
+		curRecipient = nameList.get(0);
+
+		// The CenterPanel which is the chat room
+		taMsgHistory = new JTextArea(WELCOME_TO_CHAT, 80, 80);
+		JPanel centerPanel = new JPanel(new GridLayout(1,1));
+		centerPanel.add(new JScrollPane(taMsgHistory));
+		taMsgHistory.setEditable(false);
+
+		// The MessagerPanel where one can type
+		taMessenger = new JTextArea(TYPE_CHAT_MSG);
+		taMessenger.setBackground(Color.WHITE);
+		taMessenger.setEditable(false);
+		taMessenger.addKeyListener(this);
+		centerPanel.add(taMessenger);
+		add(centerPanel, BorderLayout.CENTER);
+		
+		// button creation
+		loginBtn = new JButton("Login");
+		loginBtn.addActionListener(this);
+		exitBtn = new JButton("Exit");
+		exitBtn.addActionListener(this);
+		exitBtn.setEnabled(false);		// you have to login before being able to exit
+		sendBtn = new JButton("Send");
+		sendBtn.addActionListener(this);
+		sendBtn.setEnabled(false);
+
+		JPanel southPanel = new JPanel();
+		southPanel.add(loginBtn);
+		southPanel.add(exitBtn);
+		southPanel.add(sendBtn);
+		add(southPanel, BorderLayout.SOUTH);
+		
+		//set the word wrap of message history and Messenger
+		taMessenger.setWrapStyleWord(true);
+		taMessenger.setLineWrap(true);
+		taMsgHistory.setWrapStyleWord(true);
+		taMsgHistory.setLineWrap(true);
+		
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setSize(750, 500);
+		setVisible(true);
+		taMessenger.requestFocus();
+	}
+
+	// called by the Client to append text in the TextArea 
+	void append(String str) {
+		taMsgHistory.setText("");
+		taMsgHistory.append(str);
+		taMsgHistory.setCaretPosition(taMessenger.getText().length()); //- 1);
+	}
+	
+	// called by the GUI is the connection failed
+	// we reset our buttons, label, textfield
+	void connectionFailed() {
+		loginBtn.setEnabled(true);
+		exitBtn.setEnabled(false);
+		usernamelabel.setText("Enter your username below");
+		username.setText("Anonymous");
+		// reset port number and host name as a construction time
+		tfPort.setText("" + defaultPort);
+		tfServer.setText(defaultIP);
+		// let the user change them
+		tfServer.setEditable(false);
+		tfPort.setEditable(false);
+		// don't react to a <CR> after the username
+		username.removeActionListener(this);
+		connected = false;
+	}
+
+	/*
+	 * for enter key being pressed
+	 */
+	public void keyPressed(KeyEvent e) {
+		if(sendBtn.isEnabled()) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER){
+				sendBtn.doClick();
+			}
+		}
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) taMessenger.setText("");
+	}
+	
+	/*
+	 * Button or JTextField clicked
+	 */
+	public void actionPerformed(ActionEvent e) {
+		// check for which button is pressed
+		if(e.getSource() == exitBtn) {
+//			client.sendPrivateMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
+			return;
+		}
+		else if (e.getSource() == sendBtn) {
+			System.out.println("click was sendBtn:: in sendBtn:: ");
+			
+			String msg = taMessenger.getText() + "\n\n";
+			
+			if (taMsgHistory.getText().equals(WELCOME_TO_CHAT)) {
+				taMsgHistory.setText("");
+			}
+			taMsgHistory.append(username.getText() + ": " + msg);
+			//add username to end of message for later referencing purposes
+
+			try {
+				client.addToHistory((String) usernameList.getSelectedItem(), msg+username.getText());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
+			client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, taMessenger.getText()));
+			taMessenger.setText("");
+		}
+		else if (usernameList.isFocusOwner()){
+			if (!(curRecipient.equals((String) usernameList.getSelectedItem()))){
+				System.out.println("old recipient= " + curRecipient);
+				curRecipient = (String)usernameList.getSelectedItem();
+				System.out.println("new recipient= " + curRecipient);
+				printChatHistory();
+			}
+		}
+		else if(e.getSource() == username) {
+			System.out.println("username is being changed");
+			oldUsername = username.getText();
+		}
+		// it is coming from the JTextField
+		else if(connected) {
+			System.out.println("actionPerformed: in connected");
+			// send the message
+			client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, taMessenger.getText()));				
+//			username.setText("");
+			return;																			////////////should this be changed
+		}
+		else if(e.getSource() == loginBtn) {
+			System.out.println("actionPerformed: in loginBtn");
+
+			// ok it is a connection request
+			String username = this.username.getText().trim();
+			// empty serverAddress ignore it
+			String server = tfServer.getText().trim();
+			// empty or invalid port numer, ignore it
+			String portNumber = tfPort.getText().trim();
+			int port = 0;
+			try {
+				port = Integer.parseInt(portNumber);
+			}
+			catch(Exception en) {
+				return;   // nothing to do if port number is invalid
+			}
+
+			// try creating a new Client
+			client = new Client(server, Integer.parseInt(portNumber), username, this);
+			// test if we can start the Client
+			if(!client.start()) 
+				return;
+			connected = true;
+			
+			//enable username List
+			usernameList.setEnabled(true);
+			// disable login button
+			loginBtn.setEnabled(false);
+			// enable the 2 buttons
+			exitBtn.setEnabled(true);
+			sendBtn.setEnabled(true);
+			// disable the Server and Port JTextField
+			tfServer.setEditable(false);
+			tfPort.setEditable(false);
+			taMessenger.setEditable(true);	
+			taMessenger.setFocusable(true);
+			// Action listener for when the user enter a message
+			taMessenger.addFocusListener(new FocusListener() {
+			    public void focusGained(FocusEvent e) {}
+			    public void focusLost(FocusEvent e) {
+			    	curRecipient = (String) usernameList.getSelectedItem();}
+			});
+//			this.username.addActionListener(this);
+		}
+	}
+	
+	public void printChatHistory() {
+		taMsgHistory.setText("");
+		taMessenger.setText("");
+
+		ArrayList<String> chatToPrint = client.getAllHistoryList().get(usernameList.getSelectedItem());
+		if (chatToPrint != null && !(chatToPrint.isEmpty()))
+		{
+			for (int i = 0; i<chatToPrint.size(); i++) {
+				taMsgHistory.append(username.getText() + ": " + chatToPrint.get(i));
+			}
+		}
+	}
+
+	public JTextArea getTAMsgHist() {
+		return taMsgHistory;
+	}
+	
+	public Client getClient() {
+		return client;
+	}
+	
+	public JComboBox getUNameList() {
+		return usernameList;
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+	}
+}
+
+
