@@ -293,6 +293,33 @@ public class ClientGUI extends JFrame implements ActionListener, KeyListener{
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 	}
+	
+	/////////////////////add to history
+	public void addToHistory(String key, String msg) throws IOException {
+		System.out.println("in addToHistory");
+		if (allHistory.get(key) == null) {
+			System.out.println("in if");
+			ArrayList<String> tempList = new ArrayList<String>();
+			tempList.add(msg);
+			allHistory.put(key, tempList);
+		}
+		else if (allHistory.get(key).get(0).equals("")){
+			System.out.println("first element of " + key + " are quotes");
+			allHistory.get(key).remove(0);
+			allHistory.get(key).add(msg);
+		}
+		else if (! (allHistory.get(key).isEmpty())){
+			System.out.println(key + " list is not empty");
+			allHistory.get(key).add(msg);
+		}
+		System.out.println("done with addToHistory");
+	}
+
+	public HashMap<String, ArrayList<String>> getAllHistoryList() {
+		return allHistory;
+	}
+	
+	
 }
 
 
